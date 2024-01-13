@@ -23,6 +23,9 @@ struct ScrumsView: View {
                     }
                     .listRowBackground(scrum.theme.mainColor)
                 }
+                .onDelete { index in
+                    scrums.remove(atOffsets: index)
+                }
             }
             .navigationTitle("Daily Scrum")
             .toolbar {
@@ -31,11 +34,28 @@ struct ScrumsView: View {
                 }) {
                     Image(systemName: "plus")
                 }
+                Button(action: {
+                    showDeleteAllDialog = true
+                }) {
+                    Image(systemName: "trash")
+                        .foregroundColor(Color.red)
+                }
                 .accessibilityLabel("New Scrum")
             }
         }
         .sheet(isPresented: $isPresentingNewScrumView) {
             NewScrumSheet(scrums: $scrums, isPresentingNewScrumView: $isPresentingNewScrumView)
+        }
+        .alert("Confirm", isPresented: $showDeleteAllDialog) {
+            Button("OK") {
+                scrums.removeAll()
+                showDeleteAllDialog = false
+            }
+            Button("Cancel") {
+                showDeleteAllDialog = false
+            }
+        } message: {
+            Text("Are you sure to delete all?")
         }
         .onChange(of: scenePhase) { phase in
             if phase == .inactive { saveAction() }
