@@ -10,6 +10,8 @@ import SwiftUI
 struct DetailEditView: View {
     @Binding var scrum: DailyScrum
     @State private var newAttendeeName = ""
+    @State private var isPresenting: Bool = false
+    
     var body: some View {
         Form {
             Section(header: Text("Meeting Info")) {
@@ -37,8 +39,16 @@ struct DetailEditView: View {
                     Button(action: {
                         withAnimation {
                             let attendee = DailyScrum.Attendee(name: newAttendeeName)
-                            scrum.attendees.append(attendee)
-                            newAttendeeName = ""
+                            let attendees = scrum.attendees
+                            if attendees.count > 0 {
+//                                ForEach(attendees) { attendee in
+//                                    if attendee.name == newAttendeeName { isPresenting = true }
+//                                }
+                            }
+                            if !isPresenting {
+                                scrum.attendees.append(attendee)
+                                newAttendeeName = ""
+                            }
                         }
                     }) {
                         Image(systemName: "plus.circle.fill")
@@ -46,6 +56,14 @@ struct DetailEditView: View {
                     }
                     .disabled(newAttendeeName.isEmpty)
                 }
+            }
+            .alert("", isPresented: $isPresenting) {
+                Button("OK") {
+                    isPresenting = false
+                    newAttendeeName = ""
+                }
+            } message: {
+                Text("attendee name of \"\(newAttendeeName)\" what already exsits")
             }
         }
     }
