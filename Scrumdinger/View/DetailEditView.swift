@@ -41,9 +41,9 @@ struct DetailEditView: View {
                             let attendee = DailyScrum.Attendee(name: newAttendeeName)
                             let attendees = scrum.attendees
                             if attendees.count > 0 {
-//                                ForEach(attendees) { attendee in
-//                                    if attendee.name == newAttendeeName { isPresenting = true }
-//                                }
+                                for attendee in attendees {
+                                    if attendee.name == newAttendeeName { isPresenting = true }
+                                }
                             }
                             if !isPresenting {
                                 scrum.attendees.append(attendee)
@@ -63,7 +63,7 @@ struct DetailEditView: View {
                     newAttendeeName = ""
                 }
             } message: {
-                Text("attendee name of \"\(newAttendeeName)\" what already exsits")
+                Text("attendee name of \"\(newAttendeeName)\" already exsits")
             }
         }
     }

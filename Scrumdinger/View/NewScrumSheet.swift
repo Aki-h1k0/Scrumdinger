@@ -49,7 +49,7 @@ struct NewScrumSheet: View {
                     case .titleEmpty:
                         Text("input any title")
                     case .titleDuplicated:
-                        Text("title of \"\(newScrum.title)\" what already exsits")
+                        Text("title of \"\(newScrum.title)\" already exsits")
                     case .attendeesNotEnough:
                         Text("You need more attendees. Do not be lonely...")
                     default:
@@ -63,9 +63,9 @@ struct NewScrumSheet: View {
         isPresentingAlertDialog = false
         
         if newScrum.attendees.count < 2 { controlState = .attendeesNotEnough }
-//        ForEach(scrums) { scrum in
-//            if scrum.title == newScrum.title { controlState = .titleDuplicated }
-//        }
+        for scrum in scrums {
+            if scrum.title == newScrum.title { controlState = .titleDuplicated }
+        }
         if newScrum.title.isEmpty { controlState = .titleEmpty }
         
         if controlState != .defaultState { isPresentingAlertDialog = true }
