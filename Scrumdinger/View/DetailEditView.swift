@@ -27,11 +27,16 @@ struct DetailEditView: View {
             }
             Section(header: Text("Attendees")) {
                 ForEach(scrum.attendees) { attendee in
-                    Text(attendee.name)
+                    HStack {
+                        Text(attendee.name)
+                        Spacer()
+                        Image(systemName: "equal")
+                    }
                 }
                 .onDelete { indices in
                     scrum.attendees.remove(atOffsets: indices)
                 }
+                .onMove(perform: moveRow)
                 HStack {
                     TextField("New Attendee", text: $newAttendeeName)
                     Button(action: {
@@ -49,6 +54,11 @@ struct DetailEditView: View {
             }
         }
     }
+    
+    private func moveRow(from source: IndexSet, to destination: Int) {
+        scrum.attendees.move(fromOffsets: source, toOffset: destination)
+    }
+    
 }
 
 struct DetailEditView_Previews: PreviewProvider {
