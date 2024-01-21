@@ -11,7 +11,8 @@ struct DetailView: View {
     @Binding var scrum: DailyScrum
     
     @State private var editingScrum = DailyScrum.emptyScrum
-    @State private var isPressingEditView = false
+    @State private var isPresentingEditView = false
+    @State private var isPresentingConfirmDialog = false
     
     var body: some View {
         List {
@@ -38,11 +39,13 @@ struct DetailView: View {
                 }
                 .accessibilityElement(children: .combine)
             }
-            Section(header: Text("Attendees")) {
+            .textCase(.none)
+            Section(header: headerView()) {
                 ForEach(scrum.attendees) { attendee in
                     Label(attendee.name, systemImage: "person")
                 }
             }
+            .textCase(.none)
             Section(header: Text("History")) {
                 if scrum.history.isEmpty {
                     Label("No meetings yet", systemImage: "calendar.badge.exclamationmark")
@@ -56,33 +59,61 @@ struct DetailView: View {
                     }
                 }
             }
+            .textCase(.none)
         }
         .navigationTitle(scrum.title)
         .toolbar {
             Button("Edit") {
-                isPressingEditView = true
+                isPresentingEditView = true
                 editingScrum = scrum
             }
         }
-        .sheet(isPresented: $isPressingEditView) {
+        .sheet(isPresented: $isPresentingEditView) {
             NavigationStack {
                 DetailEditView(scrum: $editingScrum)
                     .navigationTitle(scrum.title)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {
-                                isPressingEditView = false
+                                isPresentingEditView = false
                             }
                         }
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Done") {
-                                isPressingEditView = false
+                                isPresentingEditView = false
                                 scrum = editingScrum
                             }
                         }
                     }
             }
         }
+        .alert("Confirm", isPresented: $isPresentingConfirmDialog) {
+            Button("OK") {
+                scrum.attendees.shuffle()
+                isPresentingConfirmDialog = false
+            }
+            Button("Cancel") {
+                isPresentingConfirmDialog = false
+            }
+        } message: {
+            Text("Would you like to sort attendee members randomly?")
+        }
+    }
+    
+    private func headerView() -> some View {
+        HStack {
+            Text("Attendees")
+            Spacer()
+            Button(action: {
+                isPresentingConfirmDialog = true
+            }) {
+                Image(systemName: "shuffle")
+            }
+            .padding(4)
+            .background()
+            .cornerRadius(4)
+        }
+
     }
 }
 
