@@ -11,6 +11,15 @@ struct NewScrumSheet: View {
     @State private var newScrum = DailyScrum.emptyScrum
     @Binding var scrums: [DailyScrum]
     @Binding var isPresentingNewScrumView: Bool
+    @State private var controlState: ControlState = .defaultState
+    @State private var isPresentingAlertDialog = false
+    
+    enum ControlState {
+        case titleEmpty
+        case titleDuplicated
+        case attendeesNotEnough
+        case defaultState
+    }
     
     var body: some View {
         NavigationStack {
@@ -23,12 +32,43 @@ struct NewScrumSheet: View {
                     }
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Add") {
-                            scrums.append(newScrum)
-                            isPresentingNewScrumView = false
+                            checkInputInfo()
+                            if !isPresentingAlertDialog {
+                                scrums.append(newScrum)
+                                isPresentingNewScrumView = false
+                            }
                         }
                     }
                 }
+                .alert("", isPresented: $isPresentingAlertDialog) {
+                    Button("OK") {
+                        controlState = .defaultState
+                    }
+                } message: {
+                    switch controlState {
+                    case .titleEmpty:
+                        Text("input any title")
+                    case .titleDuplicated:
+                        Text("title of \"\(newScrum.title)\" already exsits")
+                    case .attendeesNotEnough:
+                        Text("You need more attendees. Do not be lonely...")
+                    default:
+                        Text("")
+                    }
+                }
         }
+    }
+    
+    private func checkInputInfo() {
+        isPresentingAlertDialog = false
+        
+        if newScrum.attendees.count < 2 { controlState = .attendeesNotEnough }
+        for scrum in scrums {
+            if scrum.title == newScrum.title { controlState = .titleDuplicated }
+        }
+        if newScrum.title.isEmpty { controlState = .titleEmpty }
+        
+        if controlState != .defaultState { isPresentingAlertDialog = true }
     }
 }
 
